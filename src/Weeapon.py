@@ -8,6 +8,10 @@ class weapon:
 
 iron_sword = weapon(name="Iron Sword", weapon_type="Sword", damage=10, value=10)
 
-wooden_club = weapon(name="Wooden Club", weapon_type="Club", damage=5, value=5)
+Shortsword = weapon(name="Shortsword", weapon_type="piercing", damage=5, value=5)
 
 crossbow = weapon(name="Crossbow", weapon_type="Ranged", damage=20, value=20)
+
+Pseudopod = weapon(name="Pseudopod", weapon_type="Acid", damage=10, value=0)
+
+Bite = weapon(name="Bite", weapon_type="sharp", damage=4, value=0)

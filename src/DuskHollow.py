@@ -1,7 +1,8 @@
 import os, sys, time
 from Player import Player
-from Monster import Monster
-from Weeapon import wooden_club, crossbow
+from Monster import skeleton, rat, wolf
+from Weeapon import crossbow
+from Diceroll import DiceRoll
 
 
 def story_prompt():
@@ -55,58 +56,102 @@ def showInstructions() -> None:
     """)
 
 
-def status(currentRoom: str, inventory: list[str], rooms, player) -> None:
+def status(current_room: str, inventory: list[str], rooms, player) -> None:
     print("------------------")
     player.health_bar.draw()
     print(f"Inventory: {inventory}")
-    print(f"Current Room: {currentRoom}")
+    print(f"Current Room: {current_room}")
 
-    if "item" in rooms[currentRoom] and rooms[currentRoom]["item"]:
-        room_item: str = rooms[currentRoom]["item"]
+    if "item" in rooms[current_room] and rooms[current_room]["item"]:
+        room_item: str = rooms[current_room]["item"]
         print(f"You see a {room_item}")
 
-    if "monster" in rooms[currentRoom] and rooms[currentRoom]["monster"]:
-        room_monster: str = rooms[currentRoom]["monster"]
+    if "monster" in rooms[current_room] and rooms[current_room]["monster"]:
+        room_monster: str = rooms[current_room]["monster"]
         print(f"You see a {room_monster}")
 
     print("------------------")
 
+def combat(rooms, player: Player, current_room: str) -> None:
+    """
+    Handle turn-based combat between the player and a monster.
+    The combatant with the higher initiative always acts first.
+    """
+    dice = DiceRoll()
+    monster = rooms[current_room]["monster"]
+
+    player_initiative = player.dexterity_modifier + dice.rollD20()
+    monster_initiative = monster.dexterity_modifier + dice.rollD20()
+
+    print(f"{player.name} initiative: {player_initiative}")
+    print(f"{monster.name} initiative: {monster_initiative}")
+
+    # Determine turn order
+    if player_initiative >= monster_initiative:
+        turn_order = ("player", "monster")
+        print(f"{player.name} acts first!")
+    else:
+        turn_order = ("monster", "player")
+        print(f"{monster.name} acts first!")
+    
+    while True:
+        for actor in turn_order:
+            if actor == "player":
+                player.melee_attack(monster)
+            else:
+                monster.attack(player)
+
+            player.health_bar.draw()
+            monster.health_bar.draw()
+            input()
+
+            # Check win/loss conditions immediately after each action
+            if player.health <= 0:
+                print(f"You have been slain by the {monster.name}.")
+                print("Game over.")
+                sys.exit()
+
+            if monster.health <= 0:
+                print(f"You have slain the {monster.name}.")
+                rooms[current_room]["monster"] = ""
+                return
+
 
 def main() -> None:
     inventory: list[str] = []
-    currentRoom: str = "Hall"
-    player = Player()
-    skeleton = Monster(name="Skeleton", health=30, damage=10, weapon=wooden_club)
+    current_room: str = "Hall"
+    player = Player(dexterity=14)
+    running = True
 
     rooms = {
-        "Garden": {"north": "Dining Room", "item": crossbow.name},
-        "Dining Room": {"south": "Garden", "west": "Hall", "item": "potion"},
+        "Garden": {"north": "Dining Room", "item": crossbow.name, "monster": wolf},
+        "Dining Room": {"south": "Garden", "west": "Hall", "item": "potion", "monster": rat},
         "Hall": {"south": "Kitchen", "east": "Dining Room", "item": "key"},
         "Kitchen": {"north": "Hall", "item": "Bread", "monster": skeleton},
     }
 
-    typewriter_sliced(story_prompt(), 0.05)
+    typewriter_sliced(story_prompt(), 0.0001) # Set to 0.05 if not testing
     showInstructions()
-
+    
     # Gameplay Loop
-    while True:
-        status(currentRoom, inventory, rooms, player)
+    while running:
+        status(current_room, inventory, rooms, player)
         move: list[str] = input(">").split(" ", 1)
 
         clear_terminal()
 
         if move[0] == "get":
-            if move[1] == rooms[currentRoom]["item"]:
+            if move[1] == rooms[current_room]["item"]:
                 print(f"You got {move[1]}")
                 inventory.append(move[1])
-                if rooms[currentRoom]["item"] == "Crossbow":
+                if rooms[current_room]["item"] == "Crossbow":
                     player.equip(crossbow)
-                rooms[currentRoom]["item"] = ""
+                rooms[current_room]["item"] = ""
             else:
                 print(f"You don't see any {move[1]} here")
         elif move[0] == "go":
-            if move[1] in rooms[currentRoom]:
-                currentRoom = rooms[currentRoom][move[1]]
+            if move[1] in rooms[current_room]:
+                current_room = rooms[current_room][move[1]]
             else:
                 print(f"You can't go {move[1]}")
         elif move[0] == "exit":
@@ -114,22 +159,12 @@ def main() -> None:
         else:
             print("Invalid Command")
 
-        if "key" in inventory and "potion" in inventory and currentRoom == "Garden":
+        if "key" in inventory and "potion" in inventory and current_room == "Garden":
             print("You have escaped through the garden. You Win")
             break
 
-        if "monster" in rooms[currentRoom]:
-            while True:
-                player.melee_attack(skeleton)
-                skeleton.attack(player)
-                player.health_bar.draw()
-                skeleton.health_bar.draw()
-                input()
-                if skeleton.health == 0:
-                    break
-            print(f"You defeated the {rooms[currentRoom]['monster']}")
-            print("You Win")
-            break
+        if "monster" in rooms[current_room]:
+            combat(rooms=rooms, player=player, current_room=current_room)
 
 
 if __name__ == "__main__":
