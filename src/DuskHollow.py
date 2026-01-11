@@ -27,7 +27,7 @@ def clear_terminal() -> None:
 
     Designed for both Window and Unix systems
     """
-    os.system('cls' if os.name == 'NT' else "clear")
+    os.system("cls" if os.name == "NT" else "clear")
 
 
 def showInstructions() -> None:
@@ -40,6 +40,7 @@ def showInstructions() -> None:
     Commands:
       go [direction]
       get [item]
+      exit
     """)
 
 
@@ -49,19 +50,19 @@ def status(currentRoom: str, inventory: list[str], rooms) -> None:
     print(f"Inventory: {inventory}")
 
     if "item" in rooms[currentRoom] and rooms[currentRoom]["item"]:
-        room_item = rooms[currentRoom]["item"]
+        room_item: str = rooms[currentRoom]["item"]
         print(f"You see a {room_item}")
 
     if "monster" in rooms[currentRoom] and rooms[currentRoom]["monster"]:
-        room_monster = rooms[currentRoom]["monster"]
+        room_monster: str = rooms[currentRoom]["monster"]
         print(f"You see a {room_monster}")
 
     print("------------------")
 
 
 def main() -> None:
-    inventory = []
-    currentRoom = "Hall"
+    inventory: list[str] = []
+    currentRoom: str = "Hall"
 
     rooms = {
         "Garden": {"north": "Dining Room", "item": "Golden sword"},
@@ -73,10 +74,10 @@ def main() -> None:
     print(story_prompt())
     showInstructions()
 
+    # Gameplay Loop
     while True:
         status(currentRoom, inventory, rooms)
-        move: str = input(">")
-        move: list[str] = move.split(" ", 1)
+        move: list[str] = input(">").lower().split(" ", 1)
 
         clear_terminal()
 
@@ -92,9 +93,17 @@ def main() -> None:
                 currentRoom = rooms[currentRoom][move[1]]
             else:
                 print(f"You can't go {move[1]}")
+        elif move[0] == "exit":
+            break
+        else:
+            print("Invalid Command")
 
         # Win Condition 1: Escape through the garden
-        if "key" in inventory and "potion" in inventory and currentRoom == "Garden":
+        if (
+            "key" in inventory
+            and "potion" in inventory
+            and currentRoom == "Garden"
+        ):
             print("You Win")
             break
 
@@ -105,7 +114,9 @@ def main() -> None:
                 print("You Win")
                 break
             else:
-                print(f"You have been slain by the {rooms[currentRoom]['monster']}")
+                print(
+                    f"You have been slain by the {rooms[currentRoom]['monster']}"
+                )
                 print("Game Over")
                 break
 
