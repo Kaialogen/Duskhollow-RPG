@@ -1,4 +1,4 @@
-from conftest import FixedDice
+from .conftest import FixedDice
 
 
 # Test 1: Test ability modifiers

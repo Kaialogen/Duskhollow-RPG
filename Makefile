@@ -15,4 +15,4 @@ test:
 	uv run pytest -q -v --cov
 
 run:
-	uv run python -m game
+	uv run python3 -m game

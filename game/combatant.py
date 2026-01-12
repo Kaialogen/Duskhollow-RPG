@@ -65,7 +65,8 @@ class Combatant:
         rolls = num_dice * (2 if critical else 1)
 
         damage = dice.roll(sides, rolls) + self.strength_modifier
-        return max(1, damage)
+        total: int = max(1, damage)
+        return total
 
     def is_alive(self) -> bool:
         return self.health > 0

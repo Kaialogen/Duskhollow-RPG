@@ -2,12 +2,12 @@ import os
 import sys
 import time
 from .player import Player
-from .monster import skeleton, rat, wolf
+from .monster import skeleton, rat, wolf, Monster
 from .weapon import crossbow
 from .dice_roll import DiceRoll
 
 
-def story_prompt():
+def story_prompt() -> list[str]:
     """
     Display the opening story prompt for the game.
 
@@ -27,7 +27,7 @@ def story_prompt():
     return intro_text
 
 
-def typewriter_sliced(text_list, delay) -> None:
+def typewriter_sliced(text_list: list[str], delay: float) -> None:
     for row in text_list:
         for char in row:
             sys.stdout.write(char)
@@ -59,7 +59,7 @@ def showInstructions() -> None:
     """)
 
 
-def status(current_room: str, inventory: list[str], rooms, player) -> None:
+def status(current_room: str, inventory: list[str], rooms, player: Player) -> None:
     print("------------------")
     player.health_bar.draw()
     print(f"Inventory: {inventory}")
@@ -145,7 +145,7 @@ def main() -> None:
     player = Player(dexterity=14, strength=14, armour_class=12)
     running = True
 
-    rooms = {
+    rooms: dict[str, dict] = {
         "Garden": {"north": "Dining Room", "item": crossbow.name, "monster": wolf},
         "Dining Room": {
             "south": "Garden",
