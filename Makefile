@@ -12,7 +12,7 @@ format:
 	uv run ruff format .
 
 test:
-	uv run pytest -q
+	uv run pytest -q -v --cov
 
 run:
 	uv run python -m game
