@@ -1,6 +1,12 @@
-lint:
+.PHONY: lint lint-ruff lint-mypy format test run
+
+lint: lint-ruff lint-mypy
+
+lint-ruff:
 	uv run ruff check .
-	uv run mypy src/
+
+lint-mypy:
+	uv run mypy game/
 
 format:
 	uv run ruff format .
@@ -9,4 +15,4 @@ test:
 	uv run pytest -q
 
 run:
-	uv run src/DuskHollow.py
+	uv run python -m game

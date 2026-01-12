@@ -1,5 +1,5 @@
-from Weeapon import iron_sword
-from Combatant import Combatant
+from .weapon import iron_sword
+from .combatant import Combatant
 
 
 class Player(Combatant):

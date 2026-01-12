@@ -1,5 +1,5 @@
 from math import floor
-from Health_Bar import HealthBar
+from .health_bar import HealthBar
 
 
 class Combatant:
@@ -40,7 +40,7 @@ class Combatant:
     def roll_attack(self, dice) -> tuple[int, bool]:
         """
         Roll an attack
-        
+
         :param self: Description
         :param dice: Description
         :return: (total_roll, is_critical)
@@ -50,11 +50,11 @@ class Combatant:
         is_critical = d20 == 20
         total = d20 + self.strength_modifier
         return total, is_critical
-    
+
     def roll_damage(self, dice, critical: bool = False) -> int:
         """
         Roll weapon damage. On a crit, roll damage dice twice.
-        
+
         :param self: Description
         :param dice: Description
         :param critical: Description

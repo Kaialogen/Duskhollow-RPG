@@ -1,8 +1,10 @@
-import os, sys, time
-from Player import Player
-from Monster import skeleton, rat, wolf
-from Weeapon import crossbow
-from Diceroll import DiceRoll
+import os
+import sys
+import time
+from .player import Player
+from .monster import skeleton, rat, wolf
+from .weapon import crossbow
+from .dice_roll import DiceRoll
 
 
 def story_prompt():
@@ -23,6 +25,7 @@ def story_prompt():
     ]
 
     return intro_text
+
 
 def typewriter_sliced(text_list, delay) -> None:
     for row in text_list:
@@ -72,6 +75,7 @@ def status(current_room: str, inventory: list[str], rooms, player) -> None:
 
     print("------------------")
 
+
 def combat(rooms, player: Player, current_room: str) -> None:
     """
     Handle D&D 5e-style turn-based combat between the player and a monster.
@@ -94,7 +98,7 @@ def combat(rooms, player: Player, current_room: str) -> None:
     else:
         turn_order = ("monster", "player")
         print(f"{monster.name} acts first!")
-    
+
     while True:
         for actor in turn_order:
             if actor == "player":
@@ -146,14 +150,19 @@ def main() -> None:
 
     rooms = {
         "Garden": {"north": "Dining Room", "item": crossbow.name, "monster": wolf},
-        "Dining Room": {"south": "Garden", "west": "Hall", "item": "potion", "monster": rat},
+        "Dining Room": {
+            "south": "Garden",
+            "west": "Hall",
+            "item": "potion",
+            "monster": rat,
+        },
         "Hall": {"south": "Kitchen", "east": "Dining Room", "item": "key"},
         "Kitchen": {"north": "Hall", "item": "Bread", "monster": skeleton},
     }
 
-    typewriter_sliced(story_prompt(), 0.0001) # Set to 0.05 if not testing
+    typewriter_sliced(story_prompt(), 0.05)
     showInstructions()
-    
+
     # Gameplay Loop
     while running:
         status(current_room, inventory, rooms, player)
@@ -186,7 +195,3 @@ def main() -> None:
 
         if "monster" in rooms[current_room]:
             combat(rooms=rooms, player=player, current_room=current_room)
-
-
-if __name__ == "__main__":
-    main()
